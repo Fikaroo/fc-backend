@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateProduct } from './dto/create-product.input';
 import { Product } from './models/product.model';
+import { UpdateProductInput } from './dto/update-product.input';
+import { AddProductInput } from './dto/add-product.input';
 
 @Injectable()
 export class ProductsService {
@@ -11,20 +12,27 @@ export class ProductsService {
     return await this.prisma.product.findMany();
   }
 
-  async create(data: CreateProduct): Promise<Product> {
+  async findOne(id: string): Promise<Product> {
+    return await this.prisma.product.findUnique({ where: { id } });
+  }
+
+  async create(data: AddProductInput): Promise<Product> {
     return await this.prisma.product.create({
       data: data,
     });
   }
-  // findOne(id: number) {
-  //   return `This action returns a #${id} product`;
-  // }
 
-  // update(id: number, updateProductInput: UpdateProductInput) {
-  //   return `This action updates a #${id} product`;
-  // }
+  async update(
+    id: string,
+    updateProductInput: UpdateProductInput,
+  ): Promise<Product> {
+    return await this.prisma.product.update({
+      where: { id },
+      data: updateProductInput,
+    });
+  }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} product`;
-  // }
+  async remove(id: string) {
+    return await this.prisma.product.delete({ where: { id } });
+  }
 }

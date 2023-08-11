@@ -15,20 +15,34 @@ type Product {
 }
 
 type Query {
-  products: [Product!]!
+  getAllProducts: [Product!]!
+  getProduct(id: String!): Product!
+  deleteProduct(id: String!): [Product!]!
 }
 
 type Mutation {
-  addProduct(newProductData: CreateProduct!): Product!
+  addProduct(newProductData: AddProduct!): Product!
+  updateProduct(id: String!, updateProductData: UpdateProduct!): Product!
 }
 
-input CreateProduct {
+input AddProduct {
   name: String!
   description: String
   price: Float!
-  availableQuantity: Int! = 0
-  categoryId: ID!
-  subcategoryId: ID
-  brandId: ID!
-  avgRating: Int! = 0
+  availableQuantity: Float!
+  categoryId: String!
+  subcategoryId: String
+  brandId: String!
+  avgRating: Float!
+}
+
+input UpdateProduct {
+  name: String
+  description: String
+  price: Float
+  availableQuantity: Float
+  categoryId: String
+  subcategoryId: String
+  brandId: String
+  avgRating: Float
 }
