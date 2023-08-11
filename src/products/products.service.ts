@@ -12,7 +12,7 @@ export class ProductsService {
     return await this.prisma.product.findMany();
   }
 
-  async findOne(id: string): Promise<Product> {
+  async findOneById(id: string): Promise<Product> {
     return await this.prisma.product.findUnique({ where: { id } });
   }
 

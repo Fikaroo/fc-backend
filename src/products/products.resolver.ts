@@ -14,7 +14,7 @@ export class ProductsResolver {
   }
 
   @Query(() => Product)
-  async getProduct(@Args('id') id: string): Promise<Product> {
+  async getProductById(@Args('id') id: string): Promise<Product> {
     return await this.productsService.findOne(id);
   }
 
