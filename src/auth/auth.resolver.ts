@@ -2,7 +2,11 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 import { AuthService } from './auth.service';
-import { AuthResponse, CheckAuthResponse } from './model/auth-response.model';
+import {
+  CheckAuthResponse,
+  LoginAuthResponse,
+  TokenResponse,
+} from './model/auth-response.model';
 import { LoginUserInput } from './dto/login-user.input';
 import { GqlAuthGuard } from './guards/gql-auth.guard';
 import { CreateUserInput } from 'src/users/dto/create-user.input';
@@ -22,28 +26,12 @@ export class AuthResolver {
 
   @Public()
   @UseGuards(GqlAuthGuard)
-  @Mutation(() => User)
+  @Mutation(() => LoginAuthResponse)
   async singin(
     @Args('loginUserInput') loginUserInput: LoginUserInput,
     @Context() ctx: any,
-  ): Promise<User> {
-    const { access_token, reflesh_token, user } = await this.authService.signIn(
-      ctx.user,
-    );
-
-    ctx.req.res.cookie('accessToken', access_token, {
-      maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
-      httpOnly: true,
-      signed: true,
-    });
-
-    ctx.req.res.cookie('refleshToken', reflesh_token, {
-      maxAge: this.configService.get('REFLESH_TOKEN_MAX_AGE'),
-      httpOnly: true,
-      signed: true,
-    });
-
-    return user;
+  ): Promise<LoginAuthResponse> {
+    return await this.authService.signIn(ctx.user);
   }
 
   @Public()
@@ -56,45 +44,34 @@ export class AuthResolver {
 
   @Public()
   @UseGuards(RefleshJwtAuthGuard)
-  @Mutation(() => AuthResponse)
-  async reflesh(
-    @CurrentUser() user: JwtPayloadType,
-    @Context() ctx: any,
-  ): Promise<AuthResponse> {
+  @Mutation(() => TokenResponse)
+  async reflesh(@CurrentUser() user: JwtPayloadType): Promise<TokenResponse> {
     try {
       const { access_token } = await this.authService.getAccessToken(user);
-      ctx?.req?.res?.cookie('accessToken', access_token, {
-        maxAge: 5 * 1000,
-        sameSite: 'strict',
-        httpOnly: true,
-        signed: true,
-      });
-      return { message: 'Token successfully updated' };
+      return { access_token };
     } catch (error) {
       return error;
     }
   }
 
-  @Public()
   @UseGuards(RefleshJwtAuthGuard)
   @Query(() => CheckAuthResponse)
   async checkAuth(@CurrentUser() user: User): Promise<CheckAuthResponse> {
     if (!user || JSON.stringify(user) === '{}') {
       return { auth: false };
     }
-
     return { auth: true };
   }
 
-  @Public()
-  @Mutation(() => AuthResponse)
-  async logout(@Context() ctx: any): Promise<AuthResponse> {
-    try {
-      ctx?.req?.res?.clearCookie('accessToken');
-      ctx?.req?.res?.clearCookie('refleshToken');
-      return { message: 'You are successfully logged out' };
-    } catch (error) {
-      return error;
-    }
-  }
+  // @Public()
+  // @Mutation(() => AuthResponse)
+  // async logout(@Context() ctx: any): Promise<AuthResponse> {
+  //   try {
+  //     ctx?.req?.res?.clearCookie('accessToken');
+  //     ctx?.req?.res?.clearCookie('refleshToken');
+  //     return { message: 'You are successfully logged out' };
+  //   } catch (error) {
+  //     return error;
+  //   }
+  // }
 }

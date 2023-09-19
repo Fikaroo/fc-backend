@@ -3,7 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayloadType } from '../types/jwt.type';
-import { Request } from 'express';
 
 @Injectable()
 export class RefleshJwtStrategy extends PassportStrategy(
@@ -12,9 +11,7 @@ export class RefleshJwtStrategy extends PassportStrategy(
 ) {
   constructor(private readonly configService: ConfigService) {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([
-        RefleshJwtStrategy.extractTokenFromCookie,
-      ]),
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken,
       secretOrKey: configService.get('REFLESH_TOKEN_SECRET'),
       ignoreExpiration: false,
     });
@@ -22,13 +19,5 @@ export class RefleshJwtStrategy extends PassportStrategy(
 
   async validate(payload: JwtPayloadType): Promise<JwtPayloadType> {
     return payload;
-  }
-
-  private static extractTokenFromCookie(request: Request): string | undefined {
-    let token = null;
-    if (request && request.signedCookies) {
-      token = request.signedCookies['refleshToken'];
-    }
-    return token;
   }
 }
