@@ -25,19 +25,12 @@ enum Role {
 """
 scalar Timestamp
 
-type TokenResponse {
-  access_token: String
-  reflesh_token: String
-}
-
-type LoginAuthResponse {
-  access_token: String!
-  reflesh_token: String!
-  user: User!
-}
-
 type CheckAuthResponse {
   auth: Boolean!
+}
+
+type AuthResponse {
+  message: String!
 }
 
 type Query {
@@ -46,9 +39,10 @@ type Query {
 }
 
 type Mutation {
-  singin(loginUserInput: LoginUserInput!): LoginAuthResponse!
+  singin(loginUserInput: LoginUserInput!): User!
   signup(createUserInput: CreateUserInput!): User!
-  reflesh: TokenResponse!
+  reflesh: AuthResponse!
+  logout: AuthResponse!
   updateUser(id: ID!, updateUserInput: UpdateUserInput!): User!
   removeUser(id: ID!): User!
 }

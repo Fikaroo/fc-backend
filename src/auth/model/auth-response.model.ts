@@ -18,3 +18,8 @@ export class LoginAuthResponse extends TokenResponse {
 export class CheckAuthResponse {
   auth: boolean;
 }
+
+@ObjectType()
+export class AuthResponse {
+  message: string;
+}
