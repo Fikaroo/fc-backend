@@ -1,12 +1,8 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 
 import { AuthService } from './auth.service';
-import {
-  CheckAuthResponse,
-  LoginAuthResponse,
-  TokenResponse,
-} from './model/auth-response.model';
+import { LoginAuthResponse, TokenResponse } from './model/auth-response.model';
 import { LoginUserInput } from './dto/login-user.input';
 import { GqlAuthGuard } from './guards/gql-auth.guard';
 import { CreateUserInput } from 'src/users/dto/create-user.input';
@@ -15,14 +11,10 @@ import { RefleshJwtAuthGuard } from './guards/reflesh-jwt-auth.guard';
 import { CurrentUser } from './decorators/currentUser.decorator';
 import { JwtPayloadType } from './types/jwt.type';
 import { User } from '../users/models/user.model';
-import { ConfigService } from '@nestjs/config';
 
 @Resolver()
 export class AuthResolver {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @UseGuards(GqlAuthGuard)
@@ -54,14 +46,14 @@ export class AuthResolver {
     }
   }
 
-  @UseGuards(RefleshJwtAuthGuard)
-  @Query(() => CheckAuthResponse)
-  async checkAuth(@CurrentUser() user: User): Promise<CheckAuthResponse> {
-    if (!user || JSON.stringify(user) === '{}') {
-      return { auth: false };
-    }
-    return { auth: true };
-  }
+  // @UseGuards(RefleshJwtAuthGuard)
+  // @Query(() => CheckAuthResponse)
+  // async checkAuth(@CurrentUser() user: User): Promise<CheckAuthResponse> {
+  //   if (!user || JSON.stringify(user) === '{}') {
+  //     return { auth: false };
+  //   }
+  //   return { auth: true };
+  // }
 
   // @Public()
   // @Mutation(() => AuthResponse)
