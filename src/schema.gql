@@ -2,47 +2,76 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Product {
+type User {
   id: ID!
-  name: String!
-  description: String
-  price: Float!
-  availableQuantity: Int
-  categoryId: ID!
-  subcategoryId: ID
-  brandId: ID!
-  avgRating: Int!
+  role: Role!
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String
+  createdAt: Timestamp
+  updatedAt: Timestamp
+}
+
+enum Role {
+  CUSTOMER
+  SUPPLIER
+  ADMIN
+  SUPER_ADMIN
+}
+
+"""
+`Date` type as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+"""
+scalar Timestamp
+
+type TokenResponse {
+  access_token: String
+  reflesh_token: String
+}
+
+type LoginAuthResponse {
+  access_token: String!
+  reflesh_token: String!
+  user: User!
+}
+
+type CheckAuthResponse {
+  auth: Boolean!
 }
 
 type Query {
-  getAllProducts: [Product!]!
-  getProduct(id: String!): Product!
-  deleteProduct(id: String!): [Product!]!
+  checkAuth: CheckAuthResponse!
+  user(id: ID!): User!
 }
 
 type Mutation {
-  addProduct(newProductData: AddProduct!): Product!
-  updateProduct(id: String!, updateProductData: UpdateProduct!): Product!
+  singin(loginUserInput: LoginUserInput!): LoginAuthResponse!
+  signup(createUserInput: CreateUserInput!): User!
+  reflesh: TokenResponse!
+  updateUser(id: ID!, updateUserInput: UpdateUserInput!): User!
+  removeUser(id: ID!): User!
 }
 
-input AddProduct {
-  name: String!
-  description: String
-  price: Float!
-  availableQuantity: Float!
-  categoryId: String!
-  subcategoryId: String
-  brandId: String!
-  avgRating: Float!
+input LoginUserInput {
+  email: String!
+  password: String!
 }
 
-input UpdateProduct {
-  name: String
-  description: String
-  price: Float
-  availableQuantity: Float
-  categoryId: String
-  subcategoryId: String
-  brandId: String
-  avgRating: Float
+input CreateUserInput {
+  role: Role!
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  role: Role
+  firstName: String
+  lastName: String
+  email: String
+  password: String
+  createdAt: Timestamp
+  updatedAt: Timestamp
 }

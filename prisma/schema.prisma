@@ -10,130 +10,155 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Status {
-  PENDING
-  SHIPPED
-  DELIVERED
-  CANCELLED
+enum Role {
+  CUSTOMER
+  SUPPLIER
+  ADMIN
+  SUPER_ADMIN
 }
 
-model Customer {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   firstName String
   lastName  String
-  email     String  @unique
-  phone     String?
-  address   String?
-
-  reviews Review[]
-  orders  Order[]
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt()
 }
 
 model Category {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
 
-  subcategories Subcategory[]
-  products      Product[]
-}
+  parentId       String?    @db.ObjectId
+  parentCategory Category?  @relation("ParentCategory", fields: [parentId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+  subcategories  Category[] @relation("ParentCategory")
 
-model Subcategory {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-
-  category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId String?   @db.ObjectId
-
-  products Product[]
-}
-
-model Brand {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-  image       String?
-
-  products Product[]
+  products   Product[] @relation(fields: [productIDs], references: [id])
+  productIDs String[]  @db.ObjectId
 }
 
 model Product {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
-  name              String
-  description       String?
-  price             Float
-  availableQuantity Int     @default(0)
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  price Float
 
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId String   @db.ObjectId
-
-  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
-  subcategoryId String?      @db.ObjectId
-
-  brand   Brand  @relation(fields: [brandId], references: [id])
-  brandId String @db.ObjectId
-
-  avgRating Float @default(0)
-
-  images ProductImage[]
-
-  reviews Review[]
-
-  orderItems OrderItem[]
+  categories  Category[] @relation(fields: [categoryIDs], references: [id])
+  categoryIDs String[]   @db.ObjectId
 }
 
-model ProductImage {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  productId String  @db.ObjectId
-  imageUrl  String
-  product   Product @relation(fields: [productId], references: [id])
-}
+// enum Status {
+//   PENDING
+//   SHIPPED
+//   DELIVERED
+//   CANCELLED
+// }
 
-model Review {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  rating     Int
-  comment    String?
-  reviewDate DateTime
+// model Customer {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   firstName String
+//   lastName  String
+//   email     String  @unique
+//   phone     String?
+//   address   String?
 
-  product   Product @relation(fields: [productId], references: [id])
-  productId String  @db.ObjectId
+//   reviews Review[]
+//   orders  Order[]
+// }
 
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @db.ObjectId
-}
+// model Category {
+//   id          String  @id @default(auto()) @map("_id") @db.ObjectId
+//   name        String  @unique
+//   description String?
+//   parent      String?
 
-model Order {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  orderDate   DateTime
-  totalAmount Float
-  orderStatus Status
+//   products   Product[] @relation(fields: [productIDs], references: [id])
+//   productIDs String[]  @db.ObjectId
+// }
 
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String   @db.ObjectId
+// model Brand {
+//   id          String  @id @default(auto()) @map("_id") @db.ObjectId
+//   name        String
+//   description String?
+//   image       String?
 
-  orderItems         OrderItem[]
-  PaymentTransaction PaymentTransaction[]
-}
+//   products Product[]
+// }
 
-model OrderItem {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  quantity Int
-  subtotal Float
+// model Product {
+//   id                String  @id @default(auto()) @map("_id") @db.ObjectId
+//   name              String
+//   description       String?
+//   price             Float
+//   availableQuantity Int     @default(0)
+//   unit              String
 
-  order   Order  @relation(fields: [orderId], references: [id])
-  orderId String @db.ObjectId
+//   categories  Category[] @relation(fields: [categoryIDs], references: [id])
+//   categoryIDs String[]   @db.ObjectId
 
-  product   Product @relation(fields: [productId], references: [id])
-  productId String  @db.ObjectId
-}
+//   brand   Brand?  @relation(fields: [brandId], references: [id])
+//   brandId String? @db.ObjectId
 
-model PaymentTransaction {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  transactionDate DateTime
-  amount          Float
-  paymentMethod   String
+//   avgRating Float @default(0)
 
-  order   Order  @relation(fields: [orderId], references: [id])
-  orderId String @db.ObjectId
-}
+//   images     ProductImage[]
+//   reviews    Review[]
+//   orderItems OrderItem[]
+// }
+
+// model ProductImage {
+//   id        String  @id @default(auto()) @map("_id") @db.ObjectId
+//   productId String  @db.ObjectId
+//   imageUrl  String
+//   product   Product @relation(fields: [productId], references: [id])
+// }
+
+// model Review {
+//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
+//   rating     Int
+//   comment    String?
+//   reviewDate DateTime
+
+//   product   Product @relation(fields: [productId], references: [id])
+//   productId String  @db.ObjectId
+
+//   customer   Customer @relation(fields: [customerId], references: [id])
+//   customerId String   @db.ObjectId
+// }
+
+// model Order {
+//   id          String   @id @default(auto()) @map("_id") @db.ObjectId
+//   orderDate   DateTime
+//   totalAmount Float
+//   orderStatus Status
+
+//   customer   Customer @relation(fields: [customerId], references: [id])
+//   customerId String   @db.ObjectId
+
+//   orderItems         OrderItem[]
+//   paymentTransaction PaymentTransaction[]
+// }
+
+// model OrderItem {
+//   id       String @id @default(auto()) @map("_id") @db.ObjectId
+//   quantity Int
+//   subtotal Float
+
+//   order   Order  @relation(fields: [orderId], references: [id])
+//   orderId String @db.ObjectId
+
+//   product   Product @relation(fields: [productId], references: [id])
+//   productId String  @db.ObjectId
+// }
+
+// model PaymentTransaction {
+//   id              String   @id @default(auto()) @map("_id") @db.ObjectId
+//   transactionDate DateTime
+//   amount          Float
+//   paymentMethod   String
+
+//   order   Order  @relation(fields: [orderId], references: [id])
+//   orderId String @db.ObjectId
+// }
