@@ -13,8 +13,3 @@ export class LoginAuthResponse extends TokenResponse {
   access_token: string;
   reflesh_token: string;
 }
-
-@ObjectType()
-export class CheckAuthResponse {
-  auth: boolean;
-}
