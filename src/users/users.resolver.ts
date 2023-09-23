@@ -33,11 +33,11 @@ export class UsersResolver {
     @Args('updateUserInput') updateUserInput: UpdateUserInput,
     @Context() ctx: any,
   ) {
-    const { payload } = ctx.req.user;
+    const user = ctx.req.user;
     const action = Action.Update;
     const subject = await this.usersService.findUserById(id);
 
-    this.caslAbility.checkAbility({ action, subject }, payload);
+    this.caslAbility.checkAbility({ action, subject }, user);
     return this.usersService.update(id, updateUserInput);
   }
 

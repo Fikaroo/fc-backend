@@ -54,6 +54,16 @@ export class AuthResolver {
     return await this.authService.singUp(createUserInput);
   }
 
+  @UseGuards(RefleshJwtAuthGuard)
+  @Query(() => CheckAuthResponse)
+  async checkAuth(@CurrentUser() user: User): Promise<CheckAuthResponse> {
+    if (!user || JSON.stringify(user) === '{}') {
+      return { auth: false };
+    }
+
+    return { auth: true };
+  }
+
   @Public()
   @UseGuards(RefleshJwtAuthGuard)
   @Mutation(() => AuthResponse)
@@ -65,7 +75,6 @@ export class AuthResolver {
       const { access_token } = await this.authService.getAccessToken(user);
       ctx?.req?.res?.cookie('accessToken', access_token, {
         maxAge: 5 * 1000,
-        sameSite: 'strict',
         httpOnly: true,
         signed: true,
       });
@@ -73,17 +82,6 @@ export class AuthResolver {
     } catch (error) {
       return error;
     }
-  }
-
-  @Public()
-  @UseGuards(RefleshJwtAuthGuard)
-  @Query(() => CheckAuthResponse)
-  async checkAuth(@CurrentUser() user: User): Promise<CheckAuthResponse> {
-    if (!user || JSON.stringify(user) === '{}') {
-      return { auth: false };
-    }
-
-    return { auth: true };
   }
 
   @Public()
