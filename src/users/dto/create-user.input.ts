@@ -4,7 +4,11 @@ import { Role } from '@prisma/client';
 import { IsEmail } from 'class-validator';
 
 @InputType()
-export class CreateUserInput extends OmitType(User, ['id']) {
+export class CreateUserInput extends OmitType(User, [
+  'id',
+  'createdAt',
+  'updatedAt',
+]) {
   firstName: string;
   lastName: string;
 

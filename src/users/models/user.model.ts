@@ -15,13 +15,10 @@ export class User {
   firstName: string;
   lastName: string;
   email: string;
-
   @Exclude()
   password?: string;
-
   @Field(() => Role)
   role: Role;
-
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

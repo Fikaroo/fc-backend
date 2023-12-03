@@ -9,8 +9,8 @@ type User {
   lastName: String!
   email: String!
   password: String
-  createdAt: Timestamp
-  updatedAt: Timestamp
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
 }
 
 enum Role {
@@ -33,9 +33,30 @@ type AuthResponse {
   message: String!
 }
 
+type Variant {
+  id: ID!
+  unitId: ID!
+  name: String!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+}
+
+type Unit {
+  id: ID!
+  variants: [Variant!]!
+  name: String!
+  value: String!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+}
+
 type Query {
   checkAuth: CheckAuthResponse!
   user(id: ID!): User!
+  units: [Unit!]!
+  unit(id: ID!): Unit!
+  variants: [Variant!]!
+  variant(id: ID!): Variant!
 }
 
 type Mutation {
@@ -45,6 +66,12 @@ type Mutation {
   logout: AuthResponse!
   updateUser(id: ID!, updateUserInput: UpdateUserInput!): User!
   removeUser(id: ID!): User!
+  createUnit(createUnitInput: CreateUnitInput!): Unit!
+  updateUnit(id: ID!, updateUnitInput: UpdateUnitInput!): Unit!
+  removeUnit(id: ID!): Unit!
+  createVariant(createVariantInput: CreateVariantInput!): Variant!
+  updateVariant(id: ID!, updateVariantInput: UpdateVariantInput!): Variant!
+  removeVariant(id: ID!): Variant!
 }
 
 input LoginUserInput {
@@ -66,6 +93,24 @@ input UpdateUserInput {
   lastName: String
   email: String
   password: String
-  createdAt: Timestamp
-  updatedAt: Timestamp
+}
+
+input CreateUnitInput {
+  name: String!
+  value: String!
+}
+
+input UpdateUnitInput {
+  name: String
+  value: String
+}
+
+input CreateVariantInput {
+  unitId: ID!
+  name: String!
+}
+
+input UpdateVariantInput {
+  unitId: ID
+  name: String
 }

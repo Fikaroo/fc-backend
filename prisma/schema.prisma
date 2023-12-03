@@ -48,8 +48,8 @@ model User {
   lastName  String
   email     String   @unique
   password  String
-  phone     String   @default("")
-  address   String   @default("")
+  phone     String?  @default("")
+  address   String?  @default("")
   role      Role
   // orders    Order[]
   createdAt DateTime @default(now())
@@ -119,7 +119,8 @@ model Supplier {
 
 model Unit {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  name      String    @unique
+  name      String
+  value     String    @unique
   variants  Variant[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -127,7 +128,7 @@ model Unit {
 
 model Variant {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String   @unique
+  name      String
   unit      Unit     @relation(fields: [unitId], references: [id])
   unitId    String   @db.ObjectId
   createdAt DateTime @default(now())

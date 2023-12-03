@@ -74,7 +74,7 @@ export class AuthResolver {
     try {
       const { access_token } = await this.authService.getAccessToken(user);
       ctx?.req?.res?.cookie('accessToken', access_token, {
-        maxAge: 5 * 1000,
+        maxAge: this.configService.get('ACCESS_TOKEN_MAX_AGE'),
         httpOnly: true,
         signed: true,
       });
